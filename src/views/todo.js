@@ -7,8 +7,8 @@ class Todo extends Component {
         super(props)
         this.state = {
             tasks: [
-                { name: "Learn React", category: "wip", bgcolor: "pink" },
-                { name: "Learn Redux", category: "wip", bgcolor: "skyblue" }
+                { name: "Learn React", category: "todo", bgcolor: "pink" },
+                { name: "Learn Redux", category: "todo", bgcolor: "skyblue" }
             ],
             name: "",
             category: "",
@@ -34,7 +34,6 @@ class Todo extends Component {
             }
         }
         functions[value]();
-
     }
 
     showModal = () => {
@@ -83,8 +82,12 @@ class Todo extends Component {
     }
 
     addTask = (name, bgcolor) => {
-        this.state.tasks.push({ name: name, category: 'wip', bgcolor: bgcolor })
-        console.log(this.state)
+        var brightness = this.checkColor(bgcolor)
+        if(brightness >= 100){
+            this.state.tasks.push({ name: name, category: 'todo', bgcolor: bgcolor, color: "rgb(26, 32, 41)" })
+        }else{
+            this.state.tasks.push({ name: name, category: 'todo', bgcolor: bgcolor, color: "hsl(0, 0%, 87%)" })
+        }
         this.setState({
             ...this.state,
             sname: "",
@@ -94,10 +97,17 @@ class Todo extends Component {
         });
     }
 
+    checkColor = (bgcolor) => {
+        var tinycolor = require("tinycolor2");
+        var color = tinycolor(bgcolor);
+        return color.getBrightness()
+    }
+
     render() {
 
         var tasks = {
-            wip: [],
+            todo: [],
+            doing: [],
             complete: []
         }
 
@@ -107,7 +117,7 @@ class Todo extends Component {
                     onDragStart={(e) => this.onDragStart(e, t.name)}
                     draggable
                     className="draggable"
-                    style={{ backgroundColor: t.bgcolor }}
+                    style={{ backgroundColor: t.bgcolor, color: t.color }}
                 >
                     {t.name}
                 </div>
@@ -126,11 +136,43 @@ class Todo extends Component {
                             <div className="container-drag">
                                 <div className="droppable"
                                     onDragOver={(e) => this.onDragOver(e)}
-                                    onDrop={(e) => { this.onDrop(e, "wip") }}>
-                                    {tasks.wip}
+                                    onDrop={(e) => { this.onDrop(e, "todo") }}>
+                                    {tasks.todo}
                                 </div>
                             </div>
                         </div>
+                    </div>
+                    <div className="split middle">
+                        <div className="centered">
+                            <div className="title">
+                                DOING
+                            </div>
+                            <div className="container-drag">
+                                <div className="droppable"
+                                    onDragOver={(e) => this.onDragOver(e)}
+                                    onDrop={(e) => { this.onDrop(e, "doing") }}>
+                                    {tasks.doing}
+                                </div>
+                            </div>
+                        </div>
+                        <Modal show={this.state.show}>
+                            <div>
+                                <div>
+                                    Name:
+                            </div>
+                                <input className="add-input" value={this.state.name} onChange={(e) => this.changeInput(e, 'name')} />
+                            </div>
+                            <div>
+                                <div>
+                                    Color:
+                            </div>
+                                <input name="Color Picker" type="color" value={this.state.color} onChange={(e) => this.changeInput(e, 'color')} />
+                            </div>
+                            <div className="buttons">
+                                <button className="cancel" onClick={this.hideModal}>CLOSE</button>
+                                <button className="save" onClick={() => this.addTask(this.state.name, this.state.bgcolor)}>SAVE</button>
+                            </div>
+                        </Modal>
                     </div>
                     <div className="split right">
                         <div className="centered">
@@ -146,24 +188,6 @@ class Todo extends Component {
                             </div>
                         </div>
                     </div>
-                <Modal show={this.state.show}>
-                        <div>
-                            <div>
-                                Name: 
-                            </div>
-                            < input className="add-input" value={this.state.name} onChange={(e) => this.changeInput(e, 'name')} />
-                        </div>
-                        <div>
-                            <div>
-                                Color: 
-                            </div>
-                            < input className="add-input" value={this.state.color} onChange={(e) => this.changeInput(e, 'color')} />
-                        </div>
-                        <div className="buttons">
-                            <button className="cancel" onClick={this.hideModal}>CLOSE</button>
-                            <button className="save" onClick={() => this.addTask(this.state.name, this.state.bgcolor)}>SAVE</button>
-                        </div>
-                </Modal>
                 </div>
             </div>
         )
