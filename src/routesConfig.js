@@ -7,7 +7,7 @@ const routesConfig = [
         exact:true
     },
     {
-        path:"/todo-list",
+        path:"/TodoList",
         component:Todo,
         exact:true
     },
